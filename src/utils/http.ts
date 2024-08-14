@@ -6,6 +6,8 @@ import NProgress from 'nprogress'
 import { getToken, getAuthCode } from '../utils/user'
 import config from '../../nav.config'
 import event from './mitt'
+import { VERSION } from 'src/constants'
+import { settings } from 'src/store'
 
 const DEFAULT_TITLE = document.title
 const headers: Record<string, string> = {}
@@ -66,23 +68,25 @@ httpInstance.interceptors.response.use(
 const httpNavInstance = axios.create({
   timeout: 10000,
   baseURL: 'https://nav-server.netlify.app',
-  // baseURL: 'http://localhost:3000',
+  // baseURL: 'http://localhost:3007',
 })
 
 httpNavInstance.interceptors.request.use(
-  function (config) {
+  function (conf) {
     const code = getAuthCode()
     if (code) {
-      config.headers['Authorization'] = code
+      conf.headers['Authorization'] = code
     }
-    config.data = {
+    conf.data = {
       code,
       hostname: window.location.hostname,
-      ...config.data,
+      version: VERSION,
+      ...config,
+      ...conf.data,
     }
     startLoad()
 
-    return config
+    return conf
   },
   function (error) {
     stopLoad()
