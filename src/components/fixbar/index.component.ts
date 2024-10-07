@@ -1,5 +1,5 @@
-// 开源项目MIT，未经作者同意，不得以抄袭/复制代码/修改源代码版权信息，允许商业途径。
-// Copyright @ 2018-present xiejiahe. All rights reserved. MIT license.
+// 开源项目，未经作者同意，不得以抄袭/复制代码/修改源代码版权信息。
+// Copyright @ 2018-present xiejiahe. All rights reserved.
 // See https://github.com/xjh22222228/nav
 
 import {
@@ -18,6 +18,7 @@ import { websiteList, settings } from 'src/store'
 import { DB_PATH, STORAGE_KEY_MAP } from 'src/constants'
 import { Router, ActivatedRoute } from '@angular/router'
 import { $t, getLocale } from 'src/locale'
+import { addDark, removeDark } from 'src/utils/util'
 import mitt from 'src/utils/mitt'
 
 @Component({
@@ -27,6 +28,7 @@ import mitt from 'src/utils/mitt'
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class FixbarComponent {
+  @Input() showTop: boolean = true
   @Input() showCollapse: boolean = true
   @Input() collapsed: boolean = false
   @Input() selector: string = ''
@@ -39,6 +41,7 @@ export class FixbarComponent {
   isDark: boolean = isDarkFn()
   syncLoading = false
   isLogin = isLogin
+  open = localStorage.getItem(STORAGE_KEY_MAP.fixbarOpen) === 'true'
   themeList = [
     {
       name: $t('_switchTo') + ' Super',
@@ -73,13 +76,27 @@ export class FixbarComponent {
     private activatedRoute: ActivatedRoute
   ) {
     if (this.isDark) {
-      document.documentElement.classList.add('dark-container')
+      addDark()
     }
 
     const url = this.router.url.split('?')[0]
-    this.themeList = this.themeList.filter((t) => {
-      return t.url !== url
-    })
+    const defaultTheme = settings.theme?.toLowerCase?.()
+    this.themeList = this.themeList
+      .map((item) => {
+        if (item.url === '/' + defaultTheme) {
+          item.url = '/'
+        }
+        return item
+      })
+      .filter((t) => {
+        if (url === '/' && url + settings.theme?.toLowerCase?.() === t.url) {
+          return false
+        }
+        if (t.url === '/' && url === t.url + settings.theme?.toLowerCase?.()) {
+          return false
+        }
+        return t.url !== url
+      })
   }
 
   ngOnInit() {}
@@ -125,11 +142,12 @@ export class FixbarComponent {
       STORAGE_KEY_MAP.isDark,
       String(Number(this.isDark))
     )
-    document.documentElement.classList.toggle('dark-container')
 
     if (this.isDark) {
+      addDark()
       this.removeBackground()
     } else {
+      removeDark()
       const { data } = this.activatedRoute.snapshot
       data['renderLinear'] && randomBgImg()
     }
@@ -137,6 +155,11 @@ export class FixbarComponent {
 
   goSystemPage() {
     this.router.navigate(['system'])
+  }
+
+  handleOpen() {
+    this.open = !this.open
+    localStorage.setItem(STORAGE_KEY_MAP.fixbarOpen, String(this.open))
   }
 
   handleSync() {

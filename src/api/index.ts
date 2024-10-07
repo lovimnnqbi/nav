@@ -1,33 +1,103 @@
-// 开源项目MIT，未经作者同意，不得以抄袭/复制代码/修改源代码版权信息，允许商业途径。
-// Copyright @ 2018-present xiejiahe. All rights reserved. MIT license.
+// 开源项目，未经作者同意，不得以抄袭/复制代码/修改源代码版权信息。
+// Copyright @ 2018-present xiejiahe. All rights reserved.
 
-import config from '../../nav.config'
+import config from '../../nav.config.json'
 import http, { httpNav } from '../utils/http'
+import qs from 'qs'
 import { encode } from 'js-base64'
-import { settings } from 'src/store'
+import {
+  settings,
+  websiteList,
+  tagList,
+  getTagMap,
+  searchEngineList,
+  internal,
+  components,
+} from 'src/store'
+import { ISettings } from 'src/types'
+import { isSelfDevelop } from 'src/utils/util'
+import { isLogin } from 'src/utils/user'
+import { DB_PATH } from 'src/constants'
+import LZString from 'lz-string'
 
-const { gitRepoUrl } = config
+const { gitRepoUrl, imageRepoUrl } = config
 const s = gitRepoUrl.split('/')
 const DEFAULT_BRANCH = config.branch
 
-export const authorName = s[s.length - 2]
-export const repoName = s[s.length - 1]
+export let imageRepo = ''
+export let imageBranch = ''
+
+if (imageRepoUrl) {
+  const split = imageRepoUrl.split('?')
+  imageRepo = split[0].split('/').at(-1) || ''
+  const query = qs.parse(split.at(-1) || '')
+  if (query['branch']) {
+    imageBranch = query['branch'] as string
+  }
+}
+
+export const authorName = s.at(-2)
+export const repoName = s.at(-1)
 
 function isGitee() {
-  return config.provider === 'Gitee'
+  return config.gitRepoUrl.includes('gitee.com')
 }
 
 // 验证Token
 export function verifyToken(token: string) {
-  return http.get(`/users/${authorName}`, {
+  const url = isSelfDevelop ? '/api/users/verify' : `/users/${authorName}`
+  return http.get(url, {
     headers: {
       Authorization: `token ${token.trim()}`,
     },
   })
 }
 
+// 获取自有部署内容
+export function getContentes() {
+  return http.post('/api/contents/get').then((res: any) => {
+    websiteList.splice(0, websiteList.length)
+    searchEngineList.splice(0, searchEngineList.length)
+    tagList.splice(0, tagList.length)
+    components.splice(0, components.length)
+
+    internal.loginViewCount = res.data.internal.loginViewCount
+    internal.userViewCount = res.data.internal.userViewCount
+    websiteList.push(...res.data.webs)
+    tagList.push(...res.data.tags)
+    searchEngineList.push(...res.data.search)
+    components.push(...res.data.components)
+    const resSettings = res.data.settings as ISettings
+    for (const k in resSettings) {
+      // @ts-ignore
+      settings[k] = resSettings[k]
+    }
+    getTagMap()
+    return res
+  })
+}
+
+// 自有部署爬取信息
+export function spiderWeb(data?: any) {
+  return http
+    .post('/api/spider', data, {
+      timeout: 0,
+    })
+    .then((res) => {
+      getContentes()
+      return res
+    })
+}
+
 // 创建分支
 export async function createBranch(branch: string) {
+  if (isSelfDevelop) {
+    return
+  }
+  if (imageRepoUrl) {
+    return
+  }
+
   const url = isGitee()
     ? `/repos/${authorName}/${repoName}/branches`
     : `/repos/${authorName}/${repoName}/git/refs`
@@ -62,7 +132,7 @@ export function getFileContent(path: string, branch: string = DEFAULT_BRANCH) {
 
 // 更新文件内容
 type Iupdate = {
-  message: string
+  message?: string
   content: string
   path: string
   branch?: string
@@ -75,7 +145,26 @@ export async function updateFileContent({
   branch = DEFAULT_BRANCH,
   isEncode = true,
 }: Iupdate) {
+  if (isSelfDevelop) {
+    if (!isLogin) {
+      return
+    }
+    return http
+      .post('/api/contents/update', {
+        path,
+        content,
+      })
+      .then((res) => {
+        getContentes()
+        requestActionUrl()
+        return res
+      })
+  }
+
   const fileInfo = await getFileContent(path, branch)
+  if (path === DB_PATH) {
+    content = LZString.compressToBase64(content)
+  }
 
   return http
     .put(`/repos/${authorName}/${repoName}/contents/${path}`, {
@@ -101,44 +190,96 @@ export async function createFile({
   branch = DEFAULT_BRANCH,
   isEncode = true,
 }: Iupdate) {
+  if (isSelfDevelop) {
+    return http
+      .post('/api/contents/create', {
+        path,
+        content,
+      })
+      .then((res) => {
+        requestActionUrl()
+        return res
+      })
+  }
+
   const method = isGitee() ? http.post : http.put
-  return method(`/repos/${authorName}/${repoName}/contents/${path}`, {
-    message: `rebot(CI): ${message}`,
-    branch,
-    content: isEncode ? encode(content) : content,
-  }).then((res) => {
+  return method(
+    `/repos/${authorName}/${imageRepo || repoName}/contents/${path}`,
+    {
+      message: `rebot(CI): ${message}`,
+      branch,
+      content: isEncode ? encode(content) : content,
+    }
+  ).then((res) => {
     requestActionUrl()
     return res
   })
 }
 
 export async function getUserCollect(data?: Record<string, any>) {
+  if (isSelfDevelop) {
+    return http.post('/api/collect/get', data)
+  }
   return httpNav.post('/api/get', data)
 }
 
 export async function saveUserCollect(data?: Record<string, any>) {
+  if (isSelfDevelop) {
+    return http.post('/api/collect/save', data)
+  }
+
   return httpNav.post('/api/save', data)
 }
 
 export async function delUserCollect(data?: Record<string, any>) {
+  if (isSelfDevelop) {
+    return http.post('/api/collect/delete', data)
+  }
   return httpNav.post('/api/delete', data)
 }
 
-export async function getIconUrl(url: string) {
-  return httpNav.post('/api/icon', { url })
+export async function getWebInfo(url: string) {
+  try {
+    if (isSelfDevelop) {
+      const res = await http.post('/api/web/info', { url })
+      return {
+        ...res.data,
+      }
+    }
+    const res = await httpNav.post('/api/icon', { url })
+    return {
+      ...res.data,
+    }
+  } catch {
+    return {}
+  }
 }
 
 export async function bookmarksExport(data: any) {
   return httpNav.post('/api/export', data, {
-    timeout: Number.MAX_SAFE_INTEGER,
+    timeout: 0,
   })
 }
 
-export function getCDN(path: string, branch = 'image') {
+export async function getIconBase64(data: any) {
+  return httpNav.post('/api/base64', data, { timeout: 20000 })
+}
+
+export async function getUserInfo(data?: Record<string, any>) {
+  return httpNav.post('/api/info/get', data)
+}
+
+export async function updateUserInfo(data?: Record<string, any>) {
+  return httpNav.post('/api/info/update', data)
+}
+
+export function getCDN(path: string) {
+  const branch = imageBranch || 'image'
+  const repo = imageRepo || repoName
   if (isGitee()) {
-    return `https://gitee.com/${authorName}/${repoName}/raw/${branch}/${path}`
+    return `https://gitee.com/${authorName}/${repo}/raw/${branch}/${path}`
   }
-  return `https://cdn.jsdelivr.net/gh/${authorName}/${repoName}@${branch}/${path}`
+  return `https://${settings.gitHubCDN}/gh/${authorName}/${repo}@${branch}/${path}`
 }
 
 function requestActionUrl() {

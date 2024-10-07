@@ -1,6 +1,6 @@
 <p align="center">
   <a href="https://nav3.cn/?g">
-    <img src="src/assets/logo.png" width="130" />
+    <img src="https://gcore.jsdelivr.net/gh/xjh22222228/public@gh-pages/nav/logo.svg" width="130" />
   </a>
   <br />
   <b>发现导航</b>
@@ -44,12 +44,14 @@
 - 🍰 支持从浏览器书签导入
 - 🍰 支持将数据导出到浏览器书签
 - 🍰 支持用户提交收录
+- 🍰 支持自有部署/Fork
 - 🍰 丰富的资源配置系统
 - 🍰 支持 SEO 搜索引擎
 - 🍰 支持网站关联多个网址
 - 🍰 支持检测网站存活状态
 - 🍰 支持配置仅自己可见
 - 🍰 自动抓取网站图标/名称/描述
+- 🍰 海量小组件个性化定制
 - 🍰 支持暗黑模式
 - 🍰 支持后台管理, 无需部署
 - 🍰 支持多种浏览模式，创新
@@ -62,22 +64,12 @@
 - 🍰 多种卡片风格设计
 - 🍰 完全纯静态, 提供自动化部署功能
 - 🍰 三叉树分类、结构清晰、分类清晰
-- 🍰 颜值与简约并存，不再是杀马特时代
-- 🍰 完全开源，轻松定制化
 
 ## 预览
 
-- [https://nav3.cn/](https://nav3.cn/)
-- [https://faxian.vercel.app/](https://faxian.vercel.app/)
-- [https://xjh22222228.github.io/nav-web/](https://xjh22222228.github.io/nav-web/)
+- [https://nav3.cn](https://nav3.cn)
 
-![Preview](https://cdn.jsdelivr.net/gh/xjh22222228/public@gh-pages/nav/1.png)
-![Preview](https://cdn.jsdelivr.net/gh/xjh22222228/public@gh-pages/nav/8.png)
-![Preview](https://cdn.jsdelivr.net/gh/xjh22222228/public@gh-pages/nav/3.png)
-![Preview](https://cdn.jsdelivr.net/gh/xjh22222228/public@gh-pages/nav/4.png)
-![Preview](https://cdn.jsdelivr.net/gh/xjh22222228/public@gh-pages/nav/6.png)
-![Preview](https://cdn.jsdelivr.net/gh/xjh22222228/public@gh-pages/nav/9.png)
-![Preview](https://cdn.jsdelivr.net/gh/xjh22222228/public@gh-pages/nav/7.png)
+![Preview](https://gcore.jsdelivr.net/gh/xjh22222228/public@gh-pages/nav/preview.gif)
 
 ## 可以干嘛
 
@@ -99,7 +91,7 @@
 
 4、打开 https://github.com/你的用户名/nav/actions 开启 action 自动部署
 
-5、修改项目根目录配置文件 [nav.config.ts](nav.config.ts) 只需要修改仓库地址
+5、修改项目根目录配置文件 [nav.config.yaml](nav.config.yaml) 只需要修改仓库地址 `gitRepoUrl` 字段
 
 6、打开 https://你的用户名.github.io/nav 就能看到一个非常强大的导航网站了。
 
@@ -115,28 +107,49 @@
 
 [https://github.com/apps/vercel](https://github.com/apps/vercel)
 
-#### 关于自有部署
+#### 自有部署
 
-前提服务器必须能访问公网。(内网收益太小，暂时不加入需求，有需要的可以众筹) 也可以将仓库设为私有
+自有部署一直不是发现导航的需求目标，但陆续接到需求，决定从`v8.8.0`版本开始支持！
 
-将代码拉到服务器 `git clone https://github.com/xjh22222228/nav.git` 还需要安装`Node >= 18`
+#### Fork vs 自有部署
 
-执行 `npm i && npm run build`
+|          | 自有部署         | Fork             |
+| -------- | ---------------- | ---------------- |
+| 速度     | 保存即时生效     | 需要等待构建完成 |
+| 成本     | 需要自己有服务器 | 各种平台免费部署 |
+| 数据存储 | 需要定时备份     | 永久存储         |
+| 存活状态 | 未知             | 只要`GitHub`还在 |
+| 图片     | 走服务器带宽     | 免费 CDN 加速    |
 
-```bash
-# 启动 公网IP:7777, 后台系统配置请求地址填写：公网IP:7777/server
-npm run server
-```
+自有部署操作速度快，无需等待，成本较高，按需选择。
 
-#### 其他
+## 配置说明
 
-如果您有更好的部署方式，请给我们提 PR
+只需要修改根目录 `nav.config.yaml` 以下相关字段
+|Fork |自有部署 | 字段 | 说明 |
+| --------------------------------------------- | -------- |--- |--- |
+|√ | | gitRepoUrl | 填写您的仓库地址 |
+|√ | | branch | 部署分支 |
+|√ | √| hashMode | 路由是否 Hash 模式, 如果是部署在 `github pages` 务必设为 true |
+| | √| password | 自有部署登录密码，`Fork` 用户无需填写 |
+| | √| address | 自有部署, 一旦填写认为你是自有部署 |
+|√| √| email | 用户提交收录通知 |
+| | √| mailConfig | 自有部署，用户收录通知邮箱配置 |
+|√ | | imageRepoUrl | 图片仓库, 默认主仓库 `https://github.com/xjh22222228/image?branch=main` |
 
 ## 后台
 
-将路由地址修改为 `system` 即可进入，如: https://www.nav3.cn/#/light 修改为 https://www.nav3.cn/#/system
+将路由地址修改为 `system` 即可进入，如: https://www.nav3.cn 修改为 https://www.nav3.cn/system
 
 ## 升级
+
+#### 自动
+
+仅限于 `Fork` 用户
+
+[点这里安装 Pull](https://github.com/apps/pull) ， 只要有升级会自动给你的仓库提交 `Pull Requests` 点击合并即可。
+
+#### 手动
 
 将你的仓库克隆下来执行以下命令
 
@@ -157,7 +170,7 @@ npm run update
 
 ## 开发构建
 
-NODE: >= v18
+NODE: >= v20
 
 ```bash
 # 下载
@@ -165,7 +178,7 @@ git clone --depth=1 https://github.com/xjh22222228/nav.git
 
 cd nav
 
-# 安装依赖 NODE: v18
+# 安装依赖
 yarn
 
 # 启动
@@ -175,20 +188,18 @@ yarn start
 yarn build
 ```
 
-## 建议
-
-如果有任何功能上的建议可通过 [issue](https://github.com/xjh22222228/nav/issues) 发起, Thank you.
-
 ## 支持
 
 项目于 2018 年到至今一直坚持维护和开源, 经过 N 次的迭代与优化, 如果项目能帮到您是我的荣幸。
 
-您可以请作者喝杯咖啡，继续战斗下去（请备注 Github 名字）~
+您可以请作者喝杯咖啡，继续战斗下去
 
-<img src="https://cdn.jsdelivr.net/gh/xjh22222228/public@gh-pages/img/32.png" width="600">
+<img src="https://gcore.jsdelivr.net/gh/xjh22222228/public@gh-pages/img/32.png" width="600">
 
-<img src="https://cdn.jsdelivr.net/gh/xjh22222228/public@gh-pages/nav/thank.png" width="200" />
+## LICENSE
 
-## License
+For commercial sites, themes, projects, and applications, keep your source code private/proprietary by purchasing a [Commercial License](https://official.nav3.cn/pricing).
 
-[MIT](./LICENSE)
+Licensed under the GNU General Public License 3.0 for compatible open source projects and non-commercial use.
+
+Copyright 2024-present xiejiahe

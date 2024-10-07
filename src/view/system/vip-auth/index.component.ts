@@ -1,14 +1,12 @@
-// 开源项目MIT，未经作者同意，不得以抄袭/复制代码/修改源代码版权信息，允许商业途径。
-// Copyright @ 2018-present xiejiahe. All rights reserved. MIT license.
+// 开源项目，未经作者同意，不得以抄袭/复制代码/修改源代码版权信息。
+// Copyright @ 2018-present xiejiahe. All rights reserved.
 // See https://github.com/xjh22222228/nav
 
 import { Component } from '@angular/core'
 import { $t } from 'src/locale'
 import { NzMessageService } from 'ng-zorro-antd/message'
-import { NzNotificationService } from 'ng-zorro-antd/notification'
-import { NzModalService } from 'ng-zorro-antd/modal'
 import { setAuthCode, getAuthCode, removeAuthCode } from 'src/utils/user'
-import { getUserCollect } from 'src/api'
+import { getUserInfo, updateUserInfo } from 'src/api'
 
 @Component({
   selector: 'user-collect',
@@ -20,22 +18,23 @@ export default class VipAuthComponent {
   submitting: boolean = false
   isPermission = !!getAuthCode()
   authCode = ''
+  url = ''
 
-  constructor(
-    private message: NzMessageService,
-    private modal: NzModalService,
-    private notification: NzNotificationService
-  ) {}
+  constructor(private message: NzMessageService) {}
 
   ngOnInit() {
-    this.getUserCollect()
+    this.getUserInfo()
   }
 
-  getUserCollect() {
+  async getUserInfo(params?: any) {
     this.submitting = true
-    getUserCollect()
+    return getUserInfo(params)
       .then((res: any) => {
-        this.isPermission = !!res.data.success
+        if (typeof res.data?.data?.url === 'string') {
+          this.isPermission = true
+          this.url = res.data.data.url
+        }
+        return res
       })
       .finally(() => {
         this.submitting = false
@@ -47,8 +46,24 @@ export default class VipAuthComponent {
       return
     }
 
-    setAuthCode(this.authCode)
-    this.getUserCollect()
+    this.getUserInfo({ code: this.authCode }).then(() => {
+      setAuthCode(this.authCode)
+      window.location.reload()
+    })
+  }
+
+  handleSave() {
+    this.submitting = true
+    updateUserInfo({
+      url: this.url,
+    })
+      .then(() => {
+        this.getUserInfo()
+        this.message.success(this.$t('_saveSuccess'))
+      })
+      .finally(() => {
+        this.submitting = false
+      })
   }
 
   logoutAuthCode() {

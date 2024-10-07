@@ -1,5 +1,5 @@
-// 开源项目MIT，未经作者同意，不得以抄袭/复制代码/修改源代码版权信息，允许商业途径。
-// Copyright @ 2018-present xiejiahe. All rights reserved. MIT license.
+// 开源项目，未经作者同意，不得以抄袭/复制代码/修改源代码版权信息。
+// Copyright @ 2018-present xiejiahe. All rights reserved.
 // See https://github.com/xjh22222228/nav
 
 import { Injectable } from '@angular/core'
@@ -7,20 +7,20 @@ import { Router, ActivatedRoute } from '@angular/router'
 import { websiteList, settings } from 'src/store'
 import {
   queryString,
-  toggleCollapseAll,
   fuzzySearch,
   matchCurrentList,
-  setWebsiteList,
   getOverIndex,
 } from 'src/utils'
+import { setWebsiteList, toggleCollapseAll } from 'src/utils/web'
 import { INavProps, INavThreeProp } from 'src/types'
 import { isLogin } from 'src/utils/user'
+import { isSelfDevelop } from 'src/utils/util'
 import event from 'src/utils/mitt'
 
 @Injectable({
   providedIn: 'root',
 })
-export class ServiceCommonService {
+export class CommonService {
   isLogin = isLogin
   settings = settings
   websiteList: INavProps[] = websiteList
@@ -112,7 +112,9 @@ export class ServiceCommonService {
   onCollapse = (item: any, index: number) => {
     item.collapsed = !item.collapsed
     this.websiteList[this.page].nav[this.id].nav[index] = item
-    setWebsiteList(this.websiteList)
+    if (!isSelfDevelop) {
+      setWebsiteList(this.websiteList)
+    }
   }
 
   getOverIndex(selector: string) {

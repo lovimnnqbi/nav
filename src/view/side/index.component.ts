@@ -1,14 +1,17 @@
-// 开源项目MIT，未经作者同意，不得以抄袭/复制代码/修改源代码版权信息，允许商业途径。
-// Copyright @ 2018-present xiejiahe. All rights reserved. MIT license.
+// 开源项目，未经作者同意，不得以抄袭/复制代码/修改源代码版权信息。
+// Copyright @ 2018-present xiejiahe. All rights reserved.
 // See https://github.com/xjh22222228/nav
 
 import { Component } from '@angular/core'
 import { INavProps } from 'src/types'
-import { setWebsiteList, isMobile } from 'src/utils'
+import { isMobile } from 'src/utils'
+import { setWebsiteList } from 'src/utils/web'
 import { websiteList } from 'src/store'
 import { settings } from 'src/store'
 import { $t } from 'src/locale'
-import { ServiceCommonService } from 'src/services/common'
+import { CommonService } from 'src/services/common'
+import { STORAGE_KEY_MAP } from 'src/constants'
+import { isSelfDevelop } from 'src/utils/util'
 
 @Component({
   selector: 'app-side',
@@ -20,9 +23,20 @@ export default class SideComponent {
   websiteList: INavProps[] = websiteList
   isCollapsed = isMobile() || settings.sideCollapsed
 
-  constructor(public serviceCommon: ServiceCommonService) {}
+  constructor(public commonService: CommonService) {
+    const localCollapsed = localStorage.getItem(STORAGE_KEY_MAP.sideCollapsed)
+    if (localCollapsed) {
+      this.isCollapsed = localCollapsed === 'true'
+    }
+  }
 
-  ngOnInit() {}
+  get nzXXl(): number {
+    const cardStyle = this.commonService.settings.sideCardStyle
+    if (cardStyle === 'original' || cardStyle === 'example') {
+      return 4
+    }
+    return 6
+  }
 
   openMenu(item: any, index: number) {
     this.websiteList.forEach((data, idx) => {
@@ -32,6 +46,16 @@ export default class SideComponent {
         data.collapsed = false
       }
     })
-    setWebsiteList(this.websiteList)
+    if (!isSelfDevelop) {
+      setWebsiteList(this.websiteList)
+    }
+  }
+
+  handleCollapsed() {
+    this.isCollapsed = !this.isCollapsed
+    localStorage.setItem(
+      STORAGE_KEY_MAP.sideCollapsed,
+      String(this.isCollapsed)
+    )
   }
 }

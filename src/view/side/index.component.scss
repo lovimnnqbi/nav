@@ -4,7 +4,6 @@
   }
   .sider {
     --menuTitleWidth: 85px;
-    padding-top: 40px !important;
   }
 }
 
@@ -12,6 +11,7 @@
   min-height: 100vh;
   .inner-layout {
     .content {
+      margin-bottom: 2rem;
       padding: 10px 70px 0 20px;
       display: flex;
       flex-direction: column;
@@ -34,7 +34,7 @@
     top: 0;
     padding: 0 15px;
 
-    .collapse {
+    .collapseIcon {
       display: block;
       transform: rotate(-270deg);
 
@@ -48,16 +48,26 @@
     padding-right: 40px;
     padding-left: 38px !important;
   }
-  ::ng-deep.ant-menu-title-content {
-    display: flex;
-    align-items: center;
-  }
-  ::ng-deep .web-list {
-    max-width: 100% !important;
-  }
-  ::ng-deep .mobile-search {
-    .engine-main {
-      max-width: 95% !important;
+  ::ng-deep {
+    .ant-menu-title-content {
+      display: flex;
+      align-items: center;
+    }
+    .ant-menu.ant-menu-inline-collapsed {
+      & > .ant-menu-submenu > .ant-menu-submenu-title {
+        padding: 0 !important;
+        text-align: center;
+        font-weight: 400;
+      }
+      .sideicon {
+        margin-right: 0;
+      }
+    }
+
+    .mobile-search {
+      .engine-main {
+        max-width: 95% !important;
+      }
     }
   }
 }
@@ -119,16 +129,5 @@
   object-fit: cover;
   &.fixicon {
     margin-right: 8px;
-  }
-}
-
-::ng-deep {
-  #app-footer {
-    margin-top: 45px;
-  }
-  #app-footer,
-  #app-footer .copyright {
-    margin-bottom: 10px;
-    color: #666;
   }
 }

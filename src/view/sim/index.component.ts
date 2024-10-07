@@ -1,10 +1,10 @@
-// 开源项目MIT，未经作者同意，不得以抄袭/复制代码/修改源代码版权信息，允许商业途径。
-// Copyright @ 2018-present xiejiahe. All rights reserved. MIT license.
+// 开源项目，未经作者同意，不得以抄袭/复制代码/修改源代码版权信息。
+// Copyright @ 2018-present xiejiahe. All rights reserved.
 
 import { Component } from '@angular/core'
 import { isLogin } from 'src/utils/user'
 import { settings, internal } from 'src/store'
-import { ServiceCommonService } from 'src/services/common'
+import { CommonService } from 'src/services/common'
 
 @Component({
   selector: 'app-sim',
@@ -17,13 +17,15 @@ export default class SimComponent {
     String(isLogin ? internal.loginViewCount : internal.userViewCount)
   )
 
-  constructor(public serviceCommon: ServiceCommonService) {}
+  constructor(public commonService: CommonService) {}
 
-  ngOnInit() {}
+  ngOnDestroy() {
+    this.commonService.overIndex = Number.MAX_SAFE_INTEGER
+  }
 
   ngAfterViewInit() {
-    if (this.serviceCommon.settings.simOverType === 'ellipsis') {
-      this.serviceCommon.getOverIndex('.top-nav .over-item')
+    if (this.commonService.settings.simOverType === 'ellipsis') {
+      this.commonService.getOverIndex('.top-nav .over-item')
     }
   }
 }
