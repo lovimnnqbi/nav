@@ -15,14 +15,14 @@ export class CalendarComponent {
   @Input() data!: IComponentProps
 
   date = ''
-  day = ''
+  day = 0
   week = ''
   dayOfYear = 0
 
   constructor() {
     const date = getDateTime()
     this.date = `${date.year}年${date.month}月`
-    this.day = date.zeroDate
+    this.day = date.date
     this.week = date.dayText
     this.dayOfYear = getDayOfYear()
   }

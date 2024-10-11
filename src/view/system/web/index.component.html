@@ -20,14 +20,15 @@
     {{ $t('_backup') }}
   </button>
 
-  <label
-    id="file2"
-    nz-button
-    nz-tooltip
-    nzTooltipPlacement="bottom"
-    [nzTooltipTitle]="$t('_importBackupTip')"
-  >
-    {{ $t('_importBackup') }}
+  <label id="file2">
+    <button
+      nz-button
+      nz-tooltip
+      nzTooltipPlacement="bottom"
+      [nzTooltipTitle]="$t('_importBackupTip')"
+    >
+      {{ $t('_importBackup') }}
+    </button>
     <input
       type="file"
       name="file2"

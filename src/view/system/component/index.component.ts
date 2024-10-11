@@ -16,7 +16,6 @@ import { OffWorkDrawerComponent } from 'src/components/off-work/drawer/index.com
 import { ImageDrawerComponent } from 'src/components/image/drawer/index.component'
 import { CountdownDrawerComponent } from 'src/components/countdown/drawer/index.component'
 import { HTMLDrawerComponent } from 'src/components/html/drawer/index.component'
-import { HolidayDrawerComponent } from 'src/components/holiday/drawer/index.component'
 import { componentTitleMap } from './types'
 import { isSelfDevelop } from 'src/utils/util'
 import event from 'src/utils/mitt'
@@ -33,7 +32,6 @@ export default class SystemComponentComponent {
   @ViewChild('image') imageChild!: ImageDrawerComponent
   @ViewChild('countdown') countdownChild!: CountdownDrawerComponent
   @ViewChild('html') htmlChild!: HTMLDrawerComponent
-  @ViewChild('holiday') holidayChild!: HolidayDrawerComponent
 
   $t = $t
   isSelfDevelop = isSelfDevelop
@@ -80,7 +78,6 @@ export default class SystemComponentComponent {
       [ComponentType.Image]: this.imageChild,
       [ComponentType.Countdown]: this.countdownChild,
       [ComponentType.HTML]: this.htmlChild,
-      [ComponentType.Holiday]: this.holidayChild,
     }
     types[type]?.open(data, idx)
   }

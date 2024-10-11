@@ -120,7 +120,6 @@ try {
     type: 4,
     id: -4,
     url: 'https://gcore.jsdelivr.net/gh/xjh22222228/public@gh-pages/nav/component1.jpg',
-    go: '',
     text: '只有认可，才能强大',
   }
   if (idx >= 0) {
@@ -183,20 +182,6 @@ try {
     }
   } else {
     components.push(html)
-  }
-  idx = components.findIndex((item) => item.type === 7)
-  const holiday = {
-    type: 7,
-    id: -7,
-    items: [],
-  }
-  if (idx >= 0) {
-    components[idx] = {
-      ...holiday,
-      ...components[idx],
-    }
-  } else {
-    components.push(holiday)
   }
   fs.writeFileSync(componentPath, JSON.stringify(components))
 }

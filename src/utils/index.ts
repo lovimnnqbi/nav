@@ -402,7 +402,7 @@ export function getDayOfYear() {
 }
 
 export function getDateTime() {
-  const weeks = $t('_weeks')
+  const days = $t('_weeks')
   const now = new Date()
   const year = now.getFullYear()
   const hours = addZero(now.getHours())
@@ -411,7 +411,6 @@ export function getDateTime() {
   const month = now.getMonth() + 1
   const date = now.getDate()
   const day = now.getDay()
-  const zeroDate = addZero(date)
   return {
     year,
     hours,
@@ -419,8 +418,7 @@ export function getDateTime() {
     seconds,
     month,
     date,
-    zeroDate,
-    dayText: weeks[day],
+    dayText: days[day],
   } as const
 }
 

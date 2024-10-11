@@ -10,7 +10,6 @@ import {
   searchEngineList,
   tagList,
   internal,
-  components,
 } from 'src/store'
 import { isLogin, removeWebsite } from 'src/utils/user'
 import { NzMessageService } from 'ng-zorro-antd/message'
@@ -296,7 +295,6 @@ export default class WebpComponent {
       settings,
       tag: tagList,
       search: searchEngineList,
-      component: components,
     }
     for (const k in params) {
       saveAs(
