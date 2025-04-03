@@ -3,22 +3,44 @@
 // See https://github.com/xjh22222228/nav
 
 import { Component } from '@angular/core'
+import { FormsModule } from '@angular/forms'
+import { CommonModule } from '@angular/common'
 import { $t } from 'src/locale'
 import { NzMessageService } from 'ng-zorro-antd/message'
-import { ISearchEngineProps } from 'src/types'
+import type { ISearchProps } from 'src/types'
 import { updateFileContent } from 'src/api'
 import { NzModalService } from 'ng-zorro-antd/modal'
 import { SEARCH_PATH } from 'src/constants'
 import { searchEngineList } from 'src/store'
+import { NzButtonModule } from 'ng-zorro-antd/button'
+import { NzTableModule } from 'ng-zorro-antd/table'
+import { NzInputModule } from 'ng-zorro-antd/input'
+import { NzSwitchModule } from 'ng-zorro-antd/switch'
+import { NzPopconfirmModule } from 'ng-zorro-antd/popconfirm'
+import { UploadComponent } from 'src/components/upload/index.component'
+import { isSelfDevelop } from 'src/utils/utils'
 
 @Component({
+  standalone: true,
+  imports: [
+    FormsModule,
+    CommonModule,
+    NzButtonModule,
+    NzTableModule,
+    NzInputModule,
+    UploadComponent,
+    NzSwitchModule,
+    NzPopconfirmModule,
+  ],
+  providers: [NzModalService, NzMessageService],
   selector: 'system-tag',
   templateUrl: './index.component.html',
   styleUrls: ['./index.component.scss'],
 })
 export default class SystemSearchComponent {
-  $t = $t
-  searchList: ISearchEngineProps[] = searchEngineList
+  readonly $t = $t
+  readonly isSelfDevelop = isSelfDevelop
+  searchList: ISearchProps[] = searchEngineList
   submitting: boolean = false
 
   constructor(
